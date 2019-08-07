@@ -1,0 +1,87 @@
+apply plugin: 'java'
+apply plugin: 'jacoco'
+apply plugin:'natives'
+
+sourceCompatibility = 1.7
+version = '0.0.1'
+
+switch ( OperatingSystem.current() ) {
+	case OperatingSystem.WINDOWS:
+		project.ext.lwjglNatives = "natives-windows"
+		break
+	case OperatingSystem.LINUX:
+		project.ext.lwjglNatives = "natives-linux"
+	break
+	case OperatingSystem.MAC_OS:
+		project.ext.lwjglNatives = "natives-macos"
+		break
+}
+
+project.ext.lwjglVersion = "2.8.5"
+
+repositories {
+    mavenCentral()
+    maven {
+      url 'https://clojars.org/repo/'
+    }
+    maven {
+        url 'https://repo1.maven.org/maven2/'
+    }
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'game.engine.Game'
+    }
+}
+
+dependencies {
+    compile files('lib//msdkogl.jar')
+    classpath 'gradle-natives:gradle-natives:0.1'
+    //compile files('lib//lwjgl-2.8.5.jar')
+	compile "org.lwjgl.lwjgl:lwjgl:${lwjglVersion}"
+	compile "org.lwjgl.lwjgl:lwjgl-platform:${lwjglVersion}:natives-windows"
+	compile "org.lwjgl.lwjgl:lwjgl-platform:${lwjglVersion}:natives-linux"
+	compile "org.lwjgl.lwjgl:lwjgl-platform:${lwjglVersion}:natives-osx"
+    //compile group: 'org.lwjgl.lwjgl', name: 'lwjgl', version: '2.8.5'
+    compile group: 'org.lwjgl.lwjgl', name: 'lwjgl_util', version: '2.8.5'
+    // https://clojars.org/repo/kephale/slick-util/1.0.1/slick-util-1.0.1.jar
+    //compile files('lib//slick-util.jar')
+    compile group: 'kephale', name: 'slick-util', version: '1.0.1'
+
+    compile group: 'com.google.guava', name: 'guava', version: '14.0.1'
+}
+
+natives {
+	jars = [
+		"lwjgl-platform-${lwjglVersion}-natives-windows", 
+		"lwjgl-platform-${lwjglVersion}-natives-osx", 
+		"lwjgl-platform-${lwjglVersion}-natives-linux"
+	]
+}
+
+//https://repo1.maven.org/maven2/org/lwjgl/lwjgl/lwjgl/2.8.5/lwjgl-2.8.5.jar
+//https://repo1.maven.org/maven2/org/lwjgl/lwjgl/2.8.5/lwjgl-2.8.5.jar
+
+//https://repo.maven.apache.org/maven2/org/lwjgl/lwjgl/2.8.5/lwjgl-2.8.5.jar
+
+sourceSets {
+    main {
+        java {
+            srcDir "src"
+        }
+    }
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+        html.enabled false
+    }
+}
+
+run {        
+    systemProperty 'java.library.path', 'path to ur natives')
+}
+
+check.dependsOn jacocoTestReport
