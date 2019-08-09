@@ -5,7 +5,7 @@
 [![codecov](https://codecov.io/gh/farzonl/nexuswars/branch/master/graph/badge.svg)](https://codecov.io/gh/farzonl/nexuswars)
 [![Build Status](https://travis-ci.com/farzonl/nexuswars.svg?branch=master)](https://travis-ci.com/farzonl/nexuswars)
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/farzonl/nexuswars.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/farzonl/nexuswars/alerts/)
-[![Language grade: Java](https://img.shields.io/lgtm/grade/cpp/g/farzonl/nexuswars.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/farzonl/nexuswars/context:java)
+[![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/farzonl/nexuswars.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/farzonl/nexuswars/context:java)
 
 ## Demo
 [![nexus wars](https://raw.githubusercontent.com/farzonl/nexuswars/master/nexusloop.gif)](https://youtu.be/0CYrthHQbIg)

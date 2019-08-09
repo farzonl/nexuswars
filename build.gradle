@@ -142,4 +142,4 @@ jacocoTestReport {
 // java -jar 
 // jar xf
 build.dependsOn assembler
-check.dependsOn jacocoTestReport
+run.dependsOn jacocoTestReport
