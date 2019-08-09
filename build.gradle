@@ -1,23 +1,22 @@
 apply plugin: 'java'
 apply plugin: 'jacoco'
-apply plugin:'natives'
+apply plugin: 'maven'
+apply plugin: "eclipse"
+apply plugin: "idea"
+apply plugin: "application"
 
-sourceCompatibility = 1.7
+sourceCompatibility = 1.8
 version = '0.0.1'
 
-switch ( OperatingSystem.current() ) {
-	case OperatingSystem.WINDOWS:
-		project.ext.lwjglNatives = "natives-windows"
-		break
-	case OperatingSystem.LINUX:
-		project.ext.lwjglNatives = "natives-linux"
-	break
-	case OperatingSystem.MAC_OS:
-		project.ext.lwjglNatives = "natives-macos"
-		break
+ext {
+    lwjglVersion = "2.9.0"
+    dirNatives = 'natives'
+    // Read environment variables, including variables passed by jenkins continuous integration server
+    env = System.getenv()
 }
+mainClassName = 'game.engine.Game'
 
-project.ext.lwjglVersion = "2.8.5"
+project.buildDir = 'bin'
 
 repositories {
     mavenCentral()
@@ -29,47 +28,106 @@ repositories {
     }
 }
 
-jar {
-    manifest {
-        attributes 'Main-Class': 'game.engine.Game'
-    }
+run {
+    println System.properties['java.library.path']
+    systemProperty 'java.library.path', file('bin/natives')
 }
+
+
+/*configurations {
+    natives
+}*/
 
 dependencies {
     compile files('lib//msdkogl.jar')
-    classpath 'gradle-natives:gradle-natives:0.1'
-    //compile files('lib//lwjgl-2.8.5.jar')
-	compile "org.lwjgl.lwjgl:lwjgl:${lwjglVersion}"
-	compile "org.lwjgl.lwjgl:lwjgl-platform:${lwjglVersion}:natives-windows"
-	compile "org.lwjgl.lwjgl:lwjgl-platform:${lwjglVersion}:natives-linux"
-	compile "org.lwjgl.lwjgl:lwjgl-platform:${lwjglVersion}:natives-osx"
-    //compile group: 'org.lwjgl.lwjgl', name: 'lwjgl', version: '2.8.5'
-    compile group: 'org.lwjgl.lwjgl', name: 'lwjgl_util', version: '2.8.5'
-    // https://clojars.org/repo/kephale/slick-util/1.0.1/slick-util-1.0.1.jar
-    //compile files('lib//slick-util.jar')
     compile group: 'kephale', name: 'slick-util', version: '1.0.1'
-
     compile group: 'com.google.guava', name: 'guava', version: '14.0.1'
+    compile "org.lwjgl.lwjgl:lwjgl_util:${lwjglVersion}"
+    compile "org.lwjgl.lwjgl:lwjgl:${lwjglVersion}"
 }
 
-natives {
-	jars = [
-		"lwjgl-platform-${lwjglVersion}-natives-windows", 
-		"lwjgl-platform-${lwjglVersion}-natives-osx", 
-		"lwjgl-platform-${lwjglVersion}-natives-linux"
-	]
+jar {
+    /*into 'res', {
+        from 'res'
+    }*/
+    manifest {
+        def manifestClasspath = configurations.runtime.collect { it.getName() }.join(" ")
+        attributes 'Main-Class': mainClassName
+        attributes("Class-Path": manifestClasspath)
+        attributes("Implementation-Version": env.BUILD_NUMBER + ", " + env.GIT_BRANCH + ", " + env.BUILD_ID)
+    }
 }
 
-//https://repo1.maven.org/maven2/org/lwjgl/lwjgl/lwjgl/2.8.5/lwjgl-2.8.5.jar
-//https://repo1.maven.org/maven2/org/lwjgl/lwjgl/2.8.5/lwjgl-2.8.5.jar
+def listNativePaths() {
+    ArrayList<Object> paths = new ArrayList<>();
+    configurations.compile.each { file ->
+        if (file.name.contains("natives")) {
+            zipTree(file).matching {
+                exclude {
+                    it.path.contains('META-INF')
+                }
+            }.each {
+                paths.add(it)
+            }
+        }
+    }
+    return paths
+}
 
-//https://repo.maven.apache.org/maven2/org/lwjgl/lwjgl/2.8.5/lwjgl-2.8.5.jar
+task natives(type: Sync) {
+    from listNativePaths()
+    into "$buildDir/natives"
+}
+
+task assembler(dependsOn: [
+        natives
+])
+
+/*task extractWindowsNatives(type: Sync) {
+    description = "Extract the Windows natives from the downloaded zip"
+    from {
+        configurations.natives.collect { it.getName().contains('-natives-window') ? zipTree(it) : [] }
+    }
+    into("${dirNatives}/windows")
+    exclude('META-INF/**')
+}
+
+task extractMacOSNatives(type: Sync) {
+    description = "Extracts the macOS natives from the downloaded zip"
+    from {
+        configurations.natives.collect { it.getName().contains('-natives-osx') ? zipTree(it) : [] }
+    }
+    into("${dirNatives}/macosx")
+    exclude('META-INF/**')
+}
+
+task extractLinuxNatives(type: Sync) {
+    description = "Extracts the Linux natives from the downloaded zip"
+
+    description = "Extracts the Linux natives from the downloaded zip"
+    from {
+        configurations.natives.collect { it.getName().contains('-natives-linux') ? zipTree(it) : [] }
+    }
+    into("${dirNatives}/linux")
+    exclude('META-INF/**')
+}
+
+task extractNatives {
+    description = "Extracts all the natives lwjgl libraries from the downloaded zip"
+    dependsOn extractLinuxNatives
+    dependsOn extractMacOSNatives
+    dependsOn extractWindowsNatives
+}*/
 
 sourceSets {
     main {
         java {
             srcDir "src"
         }
+        resources {
+            srcDir "res"
+        }
+        output.resourcesDir = "${project.buildDir}/res"
     }
 }
 
@@ -80,8 +138,8 @@ jacocoTestReport {
     }
 }
 
-run {        
-    systemProperty 'java.library.path', 'path to ur natives')
-}
 
+// java -jar 
+// jar xf
+build.dependsOn assembler
 check.dependsOn jacocoTestReport

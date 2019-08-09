@@ -19,7 +19,7 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
-import Intel.MediaSdk.*;
+//import Intel.MediaSdk.*;
 
 public class Game {
 
@@ -39,7 +39,7 @@ public class Game {
 	private boolean showMiniMap = true;
 	private Sprite gameOverLose, gameOverWin;
 	
-	private FBOtoMediaSdk msdk_ogl;
+	//private FBOtoMediaSdk msdk_ogl;
 	private boolean isEncoding = false;
 	private boolean isEdown   = false;
 	private boolean isHdown   = false;
@@ -113,7 +113,7 @@ public class Game {
 			return;
 		}
 		// add any game state init here
-		this.msdk_ogl = new FBOtoMediaSdk(dim.width, dim.height);
+		//this.msdk_ogl = new FBOtoMediaSdk(dim.width, dim.height);
 	}
 
 	private boolean setDisplayMode() {
@@ -163,7 +163,7 @@ public class Game {
 			if(!isHdown)
 			{
 				isHdown = true;
-				msdk_ogl.hw_swSwap();
+				//msdk_ogl.hw_swSwap();
 				System.out.println("Swappin encoding type");
 			}
 		}
@@ -177,8 +177,9 @@ public class Game {
 		while (Game.isRunning) {
 			encodeSwap();
 			encodeSwitch();
-			if(isEncoding)
-				msdk_ogl.FBOsetup();
+			if (isEncoding) {
+				//msdk_ogl.FBOsetup();
+			}
 			
 			// clear screen
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -204,8 +205,9 @@ public class Game {
 					|| Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
 				Game.isRunning = false;
 			}
-			if(isEncoding)
-				msdk_ogl.processFrame();
+			if (isEncoding) {
+				//msdk_ogl.processFrame();
+			}
 
 		}
 
@@ -213,7 +215,7 @@ public class Game {
 		// soundManager.destroy();
 
 		Display.destroy();
-		msdk_ogl.cleanUp();
+		//msdk_ogl.cleanUp();
 	}
 
 	public void frameRendering() {
@@ -317,7 +319,7 @@ public class Game {
 		gm.initDem(dim);// NOTE initialize after passing gm to menu
 
 	}
-
+	
 	public static void main(String argv[]) {
 		Game g = new Game(false, 1280, 600);
 		g.startLoop();

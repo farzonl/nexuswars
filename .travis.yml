@@ -1,0 +1,15 @@
+dist: trusty
+language: java
+jdk: oraclejdk8
+script:
+  - gradle build
+after_success:
+  - export CODECOV_TOKEN="0d573e07-e438-41c3-a8ca-22f3ede19777"
+  - bash <(curl -s https://codecov.io/bash)
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
